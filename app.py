@@ -83,10 +83,10 @@ def sacar():
         conn.execute('INSERT INTO movimientos (usuario, material_id, cantidad_sacada) VALUES (?, ?, ?)', (user, mat_id, cant))
         conn.commit()
         conn.close()
-        return f"<h1>✅ Solicitud Registrada</h1><p>Se han descontado {cant} unidades de {res[1]}.</p><a href='/albanil'>Volver al panel</a>"
+        return f"<h1>✅ Solicitud Registrada</h1><p>Se han descontado {cant} unidades de {res[1]}.</p><a href='/albañil'>Volver al panel</a>"
     else:
         conn.close()
-        return f"<h1>❌ Error de Stock</h1><p>No hay suficiente {res[1] if res else 'material'} disponible.</p><a href='/albanil'>Volver a intentar</a>"
+        return f"<h1>❌ Error de Stock</h1><p>No hay suficiente {res[1] if res else 'material'} disponible.</p><a href='/albañil'>Volver a intentar</a>"
 
 if __name__ == '__main__':
     app.run(debug=True)
