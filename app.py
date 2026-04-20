@@ -22,7 +22,7 @@ def login():
     # Lógica de acceso por roles
     if user == "ingeniero" and pas == "uady":
         return redirect(url_for('panel_ingeniero'))
-    elif user == "albanil" and pas == "123":
+    elif user == "albañil" and pas == "123":
         return redirect(url_for('panel_albanil'))
     else:
         return "<h1>Error: Usuario o contraseña incorrectos</h1><a href='/'>Volver</a>"
@@ -58,7 +58,7 @@ def agregar():
 
 # --- PANEL DEL ALBAÑIL (Vista de Stock y Solicitud) ---
 
-@app.route('/albanil')
+@app.route('/albañil')
 def panel_albanil():
     conn = get_db()
     # Traemos los materiales para que el albañil los vea en su lista desplegable
