@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitar Material</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #ecf0f1; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        select, input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn { background: #e67e22; color: white; padding: 15px; border: none; width: 100%; font-size: 1.1rem; border-radius: 5px; cursor: pointer; }
+        .stock-info { font-size: 0.9rem; color: #7f8c8d; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>👷 Solicitud de Material</h2>
+        <p class="stock-info">Selecciona el material y la cantidad que necesitas.</p>
+        
+        <form action="/sacar" method="post">
+            <label>Material disponible:</label>
+            <select name="material_id" required>
+                {% for m in materiales %}
+                <option value="{{ m[0] }}">{{ m[1] }} (Disponible: {{ m[2] }} {{ m[3] }})</option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="cantidad" placeholder="¿Cuánto necesitas?" required min="1">
+            <input type="text" name="usuario" placeholder="Tu nombre (Albañil)" required>
+            
+            <button type="submit" class="btn">SOLICITAR MATERIAL</button>
+        </form>
+        <br>
+        <a href="/">Cerrar Sesión</a>
+    </div>
+</body>
+</html>
