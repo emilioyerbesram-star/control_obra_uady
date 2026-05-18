@@ -17,27 +17,34 @@ def login():
     user = request.form['usuario']
     pas = request.form['password']
     
-    if user == "ingeniero" and pas == "uady":
+    # Pasamos a minúsculas por si el teclado pone mayúsculas automáticas
+    if user.lower() == "ingeniero" and pas == "uady":
         return redirect(url_for('panel_ingeniero'))
-    elif user == "albañil" and pas == "123":
+    elif user.lower() == "albañil" and pas == "123":
         return redirect(url_for('panel_albanil'))
     else:
         return "<h1>❌ Error: Usuario o contraseña incorrectos</h1><br><a href='/'>Volver a intentar</a>"
 
 @app.route('/ingeniero')
 def panel_ingeniero():
-    conn = get_db()
-    materiales = conn.execute('SELECT * FROM materiales').fetchall()
-    historial = conn.execute('SELECT * FROM historial ORDER BY fecha DESC').fetchall()
-    conn.close()
-    return render_template('ingeniero.html', materiales=materiales, historial=historial)
+    try:
+        conn = get_db()
+        materiales = conn.execute('SELECT * FROM materiales').fetchall()
+        historial = conn.execute('SELECT * FROM historial ORDER BY fecha DESC').fetchall()
+        conn.close()
+        return render_template('ingeniero.html', materiales=materiales, historial=historial)
+    except Exception as e:
+        return f"<h1>❌ Error en Base de Datos (Ingeniero)</h1><p>{str(e)}</p>"
 
-@app.route('/albañil')
+@app.route('/albanil_panel')
 def panel_albanil():
-    conn = get_db()
-    materiales = conn.execute('SELECT * FROM materiales').fetchall()
-    conn.close()
-    return render_template('albanil.html', materiales=materiales)
+    try:
+        conn = get_db()
+        materiales = conn.execute('SELECT * FROM materiales').fetchall()
+        conn.close()
+        return render_template('albanil.html', materiales=materiales)
+    except Exception as e:
+        return f"<h1>❌ Error en Base de Datos (Albañil)</h1><p>{str(e)}</p>"
 
 @app.route('/agregar', methods=['POST'])
 def agregar():
@@ -66,10 +73,10 @@ def sacar():
         conn.execute('INSERT INTO historial (material, cantidad, usuario) VALUES (?, ?, ?)', (material['nombre'], cantidad_sacar, usuario))
         conn.commit()
         conn.close()
-        return "<h1>✅ Solicitud Registrada</h1><p>El material se ha descontado correctamente.</p><br><a href='/albañil'>Volver al panel</a>"
+        return "<h1>✅ Solicitud Registrada</h1><p>El material se ha descontado correctamente.</p><br><a href='/albanil_panel'>Volver al panel</a>"
     else:
         conn.close()
-        return "<h1>❌ Error de Stock</h1><p>No hay suficiente material disponible o el material no existe.</p><br><a href='/albañil'>Volver a intentar</a>"
+        return "<h1>❌ Error de Stock</h1><p>No hay suficiente material disponible o el material no existe.</p><br><a href='/albanil_panel'>Volver a intentar</a>"
 
 if __name__ == '__main__':
     app.run(debug=True)
