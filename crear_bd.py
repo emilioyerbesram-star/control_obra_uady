@@ -3,28 +3,27 @@ import sqlite3
 conn = sqlite3.connect('obra.db')
 cursor = conn.cursor()
 
-# Creamos la tabla de materiales
+# Crear tabla de materiales si no existe
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS materiales (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nombre TEXT NOT NULL,
-        cantidad INTEGER NOT NULL,
-        unidad TEXT NOT NULL
-    )
+CREATE TABLE IF NOT EXISTS materiales (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    cantidad REAL NOT NULL,
+    unidad TEXT NOT NULL
+)
 ''')
 
-# Creamos la tabla de movimientos
+# Crear tabla de historial si no existe
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS movimientos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        usuario TEXT NOT NULL,
-        material_id INTEGER,
-        cantidad_sacada INTEGER,
-        fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(material_id) REFERENCES materiales(id)
-    )
+CREATE TABLE IF NOT EXISTS historial (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    material TEXT NOT NULL,
+    cantidad REAL NOT NULL,
+    usuario TEXT NOT NULL,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
 ''')
 
 conn.commit()
 conn.close()
-print("¡Tablas creadas con éxito en obra.db!")
+print("¡Base de datos y tablas creadas correctamente!")
