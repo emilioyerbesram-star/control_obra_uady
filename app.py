@@ -3,15 +3,13 @@ import sqlite3
 
 app = Flask(__name__)
 
-# Función para conectar a la Base de Datos
 def get_db():
     conn = sqlite3.connect('obra.db')
+    conn.row_factory = sqlite3.Row
     return conn
 
-# --- RUTA DE INICIO (LOGIN) ---
-
 @app.route('/')
-def index():
+def home():
     return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
@@ -19,74 +17,59 @@ def login():
     user = request.form['usuario']
     pas = request.form['password']
     
-    # Lógica de acceso por roles
     if user == "ingeniero" and pas == "uady":
         return redirect(url_for('panel_ingeniero'))
     elif user == "albañil" and pas == "123":
         return redirect(url_for('panel_albanil'))
     else:
-        return "<h1>Error: Usuario o contraseña incorrectos</h1><a href='/'>Volver</a>"
-
-# --- PANEL DEL INGENIERO (Gestión Total) ---
+        return "<h1>❌ Error: Usuario o contraseña incorrectos</h1><br><a href='/'>Volver a intentar</a>"
 
 @app.route('/ingeniero')
 def panel_ingeniero():
     conn = get_db()
-    # Obtenemos la lista de materiales para el inventario
     materiales = conn.execute('SELECT * FROM materiales').fetchall()
-    # Obtenemos el historial de salidas con nombres de materiales
-    movimientos = conn.execute('''
-        SELECT m.fecha, m.usuario, mat.nombre, m.cantidad_sacada 
-        FROM movimientos m 
-        JOIN materiales mat ON m.material_id = mat.id
-        ORDER BY m.fecha DESC
-    ''').fetchall()
+    historial = conn.execute('SELECT * FROM historial ORDER BY fecha DESC').fetchall()
     conn.close()
-    return render_template('ingeniero.html', materiales=materiales, movimientos=movimientos)
-
-@app.route('/agregar', methods=['POST'])
-def agregar():
-    nombre = request.form['nombre']
-    cant = request.form['cantidad']
-    unid = request.form['unidad']
-    
-    conn = get_db()
-    conn.execute('INSERT INTO materiales (nombre, cantidad, unidad) VALUES (?, ?, ?)', (nombre, cant, unid))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('panel_ingeniero'))
-
-# --- PANEL DEL ALBAÑIL (Vista de Stock y Solicitud) ---
+    return render_template('ingeniero.html', materiales=materiales, historial=historial)
 
 @app.route('/albañil')
 def panel_albanil():
     conn = get_db()
-    # Traemos los materiales para que el albañil los vea en su lista desplegable
     materiales = conn.execute('SELECT * FROM materiales').fetchall()
     conn.close()
     return render_template('albanil.html', materiales=materiales)
 
-@app.route('/sacar', methods=['POST'])
-def sacar():
-    mat_id = request.form['material_id']
-    cant = int(request.form['cantidad'])
-    user = request.form['usuario']
+@app.route('/agregar', methods=['POST'])
+def agregar():
+    nombre = request.form['nombre']
+    cantidad = float(request.form['cantidad'])
+    unidad = request.form['unidad']
     
     conn = get_db()
-    # Verificamos si hay stock suficiente
-    res = conn.execute('SELECT cantidad, nombre FROM materiales WHERE id=?', (mat_id,)).fetchone()
+    conn.execute('INSERT INTO materiales (nombre, cantidad, unidad) VALUES (?, ?, ?)', (nombre, cantidad, unidad))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('panel_ingeniero'))
+
+@app.route('/sacar', methods=['POST'])
+def sacar():
+    material_id = int(request.form['material_id'])
+    cantidad_sacar = float(request.form['cantidad'])
+    usuario = request.form['usuario']
     
-    if res and res[0] >= cant:
-        # Restamos la cantidad del inventario
-        conn.execute('UPDATE materiales SET cantidad = cantidad - ? WHERE id=?', (cant, mat_id))
-        # Registramos quién se llevó el material
-        conn.execute('INSERT INTO movimientos (usuario, material_id, cantidad_sacada) VALUES (?, ?, ?)', (user, mat_id, cant))
+    conn = get_db()
+    material = conn.execute('SELECT * FROM materiales WHERE id = ?', (material_id,)).fetchone()
+    
+    if material and material['cantidad'] >= cantidad_sacar:
+        nueva_cantidad = material['cantidad'] - cantidad_sacar
+        conn.execute('UPDATE materiales SET cantidad = ? WHERE id = ?', (nueva_cantidad, material_id))
+        conn.execute('INSERT INTO historial (material, cantidad, usuario) VALUES (?, ?, ?)', (material['nombre'], cantidad_sacar, usuario))
         conn.commit()
         conn.close()
-        return f"<h1>✅ Solicitud Registrada</h1><p>Se han descontado {cant} unidades de {res[1]}.</p><a href='/albañil'>Volver al panel</a>"
+        return "<h1>✅ Solicitud Registrada</h1><p>El material se ha descontado correctamente.</p><br><a href='/albañil'>Volver al panel</a>"
     else:
         conn.close()
-        return f"<h1>❌ Error de Stock</h1><p>No hay suficiente {res[1] if res else 'material'} disponible.</p><a href='/albañil'>Volver a intentar</a>"
+        return "<h1>❌ Error de Stock</h1><p>No hay suficiente material disponible o el material no existe.</p><br><a href='/albañil'>Volver a intentar</a>"
 
 if __name__ == '__main__':
     app.run(debug=True)
