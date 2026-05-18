@@ -2,21 +2,27 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Entrada - Control de Obra</title>
+    <title>CIMAT - Iniciar Sesión</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: sans-serif; background: #2c3e50; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; color: #333; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center; }
-        input { display: block; width: 100%; margin: 10px 0; padding: 10px; box-sizing: border-box; }
-        button { background: #e67e22; color: white; border: none; padding: 10px 20px; cursor: pointer; width: 100%; font-weight: bold; }
+        body { font-family: sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-width: 360px; width: 100%; text-align: center; box-sizing: border-box; }
+        .brand { font-size: 2.2rem; font-weight: bold; margin: 0; color: #2c3e50; }
+        .subtitle { font-size: 0.85rem; color: #e67e22; margin: 5px 0 20px 0; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+        .btn { background: #e67e22; color: white; padding: 12px; border: none; width: 100%; font-size: 1.1rem; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.2s; margin-top: 10px; }
+        .btn:hover { background: #d35400; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>🏗️ Obra Emilio</h2>
+        <p class="brand">CIMAT</p>
+        <p class="subtitle">Control Inteligente en Obra</p>
+        
         <form action="/login" method="post">
             <input type="text" name="usuario" placeholder="Usuario" required>
             <input type="password" name="password" placeholder="Contraseña" required>
-            <button type="submit">ENTRAR</button>
+            <button type="submit" class="btn">ENTRAR</button>
         </form>
     </div>
 </body>
