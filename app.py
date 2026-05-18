@@ -17,7 +17,6 @@ def login():
     user = request.form['usuario']
     pas = request.form['password']
     
-    # Pasamos a minúsculas por si el teclado pone mayúsculas automáticas
     if user.lower() == "ingeniero" and pas == "uady":
         return redirect(url_for('panel_ingeniero'))
     elif user.lower() == "albañil" and pas == "123":
